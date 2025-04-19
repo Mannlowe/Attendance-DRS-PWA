@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+/* Example global utility classes */
+.hide {
+  display: none !important;
+}
+
+.center-flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.text-shadow {
+  text-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.rounded-lg-shadow {
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+
+/* Add more global classes as needed */
+
+/* Hide number arrows for input[type="text"] with class hide-number-arrows (for numeric fields) */
+.hide-number-arrows::-webkit-outer-spin-button,
+.hide-number-arrows::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.hide-number-arrows[type="number"] {
+  -moz-appearance: textfield;
+}

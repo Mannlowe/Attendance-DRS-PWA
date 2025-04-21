@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, Mic, Eye, EyeOff } from 'lucide-react';
 import { loginWithAPI } from '../api/APILogin';
+import staffAttendanceImg from '../images/staff-attendance-01.png';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -46,47 +47,51 @@ const Login: React.FC = () => {
       className="min-h-screen flex items-center justify-center"
       style={{
         fontFamily: 'Montserrat',
-        background: 'linear-gradient(159deg, rgba(30,144,255,1) 0%, rgba(153,186,221,1) 100%)',
+        background: '#D5D5D5',
       }}
     >
       <div className="relative w-full max-w-sm ">
-        {/* Top yellow circle with mic icon */}
-        <div className="absolute left-1/2 transform -translate-x-1/2 z-10">
-          <div className="bg-blue-700 rounded-b-full w-36 h-20 flex flex-col items-center justify-end shadow-2xl">
-            <span className="text-lg text-white pb-2  mb-5" style={{ fontFamily: 'Montserrat',fontWeight: '600' }}>Mannlowe</span>
-          </div>
+        {/* Logo Image at the top of the card */}
+        <div className="flex justify-center">
+          <img src={staffAttendanceImg} alt="Logo" className="w-50 h-50 object-contain mb-4 mt-4" />
         </div>
         <form
           onSubmit={handleLogin}
           className="bg-white pt-16 pb-8 px-6 rounded-3xl shadow-lg w-full space-y-7"
+          style={{ boxShadow: '0 4px 24px #5E5E5E22' }}
         >
+          {/* Login Heading and Subtext */}
+          <div className="mb-2">
+            <h2 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Montserrat' }}>Login</h2>
+            <p className="text-sm text-gray-500 mt-1" style={{ fontFamily: 'Rubik' }}>Please fill in the credentials</p>
+          </div>
           {/* Email Field */}
-          <div className="flex items-center bg-gray-100 rounded-lg px-4 py-3 mt-10">
-            <Mail size={20} className="text-gray-400 mr-3" />
+          <div className="flex items-center bg-white rounded-lg px-4 py-3 mt-10 border border-[#168B45] focus-within:border-[#168B45]">
+            <Mail size={20} className="text-[#040286] mr-3" />
             <input
               id="email"
               type="email"
               placeholder="Email Address"
-              className="bg-transparent flex-1 outline-none text-gray-700 placeholder-gray-400 text-base font-medium"
+              className="bg-transparent flex-1 outline-none text-[#5E5E5E] placeholder-[#5E5E5E] text-base font-medium"
               value={email}
               onChange={e => setEmail(e.target.value)}
               autoFocus
             />
           </div>
           {/* Password Field */}
-          <div className="flex items-center bg-gray-100 rounded-lg px-4 py-3 relative">
-            <Lock size={20} className="text-gray-400 mr-3" />
+          <div className="flex items-center bg-white rounded-lg px-4 py-3 relative border border-[#168B45] focus-within:border-[#168B45]">
+            <Lock size={20} className="text-[#040286] mr-3" />
             <input
               id="password"
               type={showPassword ? 'text' : 'password'}
               placeholder="Password"
-              className="bg-transparent flex-1 outline-none text-gray-700 placeholder-gray-400 text-base font-medium pr-8"
+              className="bg-transparent flex-1 outline-none text-[#5E5E5E] placeholder-[#5E5E5E] text-base font-medium pr-8"
               value={password}
               onChange={e => setPassword(e.target.value)}
             />
             <button
               type="button"
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 focus:outline-none"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#040286] focus:outline-none"
               tabIndex={-1}
               onClick={() => setShowPassword((prev) => !prev)}
               aria-label={showPassword ? 'Hide password' : 'Show password'}
@@ -97,15 +102,15 @@ const Login: React.FC = () => {
           <div className="flex justify-center w-full">
             <button
               type="submit"
-              className="w-1/3 h-12 bg-blue-700 text-white rounded-xl shadow-black text-lg transition mt-2 font-medium"
-              style={{ boxShadow: '0 4px 12px rgba(0,0,0,0.08)', fontFamily: 'Rubik' }}
+              className="w-1/3 h-12 bg-[#040286] text-white rounded-xl shadow-black text-lg transition mt-2 font-medium"
+              style={{ boxShadow: '0 4px 12px #5E5E5E22', fontFamily: 'Rubik' }}
               disabled={loading}
             >
               {loading ? 'Logging in...' : 'Login'}
             </button>
           </div>
           {error && (
-            <div className="text-center text-red-600 font-medium mt-2" style={{ fontFamily: 'Rubik' }}>
+            <div className="text-center font-medium mt-2" style={{ color: ' #B4251C', fontFamily: 'Rubik' }}>
               {error}
             </div>
           )}

@@ -175,7 +175,7 @@ function Settings() {
     <div className="space-y-4">
       {/* --- Attendance Section (only after setup) --- */}
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold text-gray-900" style={{ fontFamily: 'Montserrat' }}>Mark Attendance</h2>
+        <h2 className="text-xl font-semibold text-[#5E5E5E]" style={{ fontFamily: 'Montserrat' }}>Mark Attendance</h2>
         {showSuccess && successData && (
           <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-start space-x-2 mb-2">
             <CheckCircle className="text-green-500 flex-shrink-0 mt-0.5" size={20} />
@@ -243,28 +243,28 @@ function Settings() {
                 {locationStatus === 'checking' ? (
                   <div className="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full flex items-center space-x-2">
                     <Loader className="animate-spin" size={16} />
-                    <span className="text-sm">Getting location...</span>
+                    <span className="text-sm" style={{ fontFamily: 'Rubik' }}>Getting location...</span>
                   </div>
                 ) : locationStatus === 'ready' && !error ? (
-                  <div className="bg-green-100 text-green-800 px-4 py-2 rounded-full flex items-center space-x-2">
+                  <div className="bg-green-100 text-[#168B45] px-4 py-2 rounded-full flex items-center space-x-2">
                     <CheckCircle size={16} />
-                    <span className="text-sm">Location verified</span>
+                    <span className="text-sm" style={{ fontFamily: 'Rubik' }}>Location verified</span>
                   </div>
                 ) : null}
                 <button
                   onClick={capture}
                   disabled={loading || !isReady}
-                  className="bg-blue-600 text-white px-6 py-2 rounded-full flex items-center space-x-2 disabled:bg-blue-400 disabled:cursor-not-allowed"
+                  className="bg-[#B4251C] text-white px-6 py-2 rounded-full flex items-center space-x-2 disabled:bg-[#B4251] disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <>
                       <Loader className="animate-spin" size={20} />
-                      <span>Processing...</span>
+                      <span style={{ fontFamily: 'Rubik' }}>Processing...</span>
                     </>
                   ) : (
                     <>
                       <Camera size={20} />
-                      <span>Take Photo</span>
+                      <span style={{ fontFamily: 'Rubik' }}>Take Photo</span>
                     </>
                   )}
                 </button>
@@ -272,7 +272,7 @@ function Settings() {
             </div>
             <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
               <MapPin size={16} />
-              <p>Please ensure you have a clear GPS signal to mark attendance</p>
+              <p style={{ fontFamily: 'Rubik' }}>Please ensure you have a clear GPS signal to mark attendance</p>
             </div>
           </>
         )}

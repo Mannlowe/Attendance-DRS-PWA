@@ -15,7 +15,7 @@ function Layout() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-lg mx-auto bg-white min-h-screen flex flex-col">
-        <header className="bg-blue-600 text-white p-4 flex items-center justify-between">
+        <header className="bg-[#040286] text-white p-4 flex items-center justify-between">
           <h1 className="text-xl font-semibold" style={{ fontFamily: 'Montserrat' }}>Employee Portal</h1>
           <button onClick={handleLogout} title="Logout" className="ml-auto p-2 hover:bg-blue-700 rounded-full">
             <LogOut size={24} />
@@ -41,7 +41,7 @@ function Layout() {
               <Link
                 to="/Settings"
                 className={`flex flex-col items-center ${
-                  location.pathname === '/Settings' ? 'text-blue-600' : 'text-gray-600'
+                  location.pathname === '/Settings' ? 'text-[#040286]' : 'text-gray-600'
                 }`}
               >
                 <Settings size={24} />

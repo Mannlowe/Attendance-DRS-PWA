@@ -32,7 +32,7 @@ export const useStore = create<AppState>()(
       fetchLogs: async (employee) => {
         set({ logsLoading: true, logsError: null });
         try {
-          const response = await fetchAttendanceLogs({ employee, limit: 15 });
+          const response = await fetchAttendanceLogs({ employee, limit: 50 });
           const sortedLogs = (response.logs || []).sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
           set({ logs: sortedLogs, logsLoading: false });
         } catch (e) {

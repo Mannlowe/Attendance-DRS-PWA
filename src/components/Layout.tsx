@@ -1,14 +1,12 @@
-import React from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, UserCheck, Calendar, Settings, History, LogOut } from 'lucide-react';
+import { Settings, History, LogOut } from 'lucide-react';
 
 function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.clear();
-    sessionStorage.clear();
+    // Just redirect to home without clearing storage or calling checkout API
     navigate('/');
   };
 

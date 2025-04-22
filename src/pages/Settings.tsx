@@ -4,6 +4,8 @@ import { Camera, Loader, AlertCircle, MapPin, CheckCircle, ArrowRight } from 'lu
 import { useStore } from '../zustandStore/store';
 import { format } from 'date-fns';
 import { logEmployeeCheckin } from '../api/APIattendance';
+import { checkoutAPI } from '../api/APILogin'
+import { useNavigate } from 'react-router-dom';
 
 function Settings() {
   // --- Attendance Section State & Logic ---
@@ -24,6 +26,46 @@ function Settings() {
     photo: string | null;
     apiResponse: any;
   } | null>(null);
+
+  const navigate = useNavigate();
+
+  // Check for saved attendance data on component mount
+  useEffect(() => {
+    const savedAttendanceStatus = localStorage.getItem('attendanceStatus');
+    const savedAttendanceData = localStorage.getItem('attendanceData');
+    
+    if (savedAttendanceStatus === 'success' && savedAttendanceData) {
+      try {
+        const parsedData = JSON.parse(savedAttendanceData);
+        // Convert string timestamp back to Date object
+        parsedData.timestamp = new Date(parsedData.timestamp);
+        setSuccessData(parsedData);
+        setShowSuccess(true);
+      } catch (error) {
+        console.error('Error parsing saved attendance data', error);
+      }
+    }
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      const employee_id = localStorage.getItem('employee_id');
+      if (!employee_id) throw new Error('Employee ID missing');
+  
+      await checkoutAPI({ employee_id }); // ✅ pass the params correctly
+      
+      // Clear attendance status from localStorage
+      localStorage.removeItem('attendanceStatus');
+      localStorage.removeItem('attendanceData');
+  
+      sessionStorage.clear(); // cleanup
+      navigate('/'); // redirect
+    } catch (error) {
+      console.error('Checkout failed', error);
+      setError('Failed to check out. Please try again.');
+    }
+  };
+  
 
   // Utility: Wait for first available position or timeout
   const getBestEffortLocation = async (timeoutMs = 10000) => {
@@ -115,6 +157,29 @@ function Settings() {
 
   const capture = useCallback(async () => {
     try {
+      // Check if attendance was already marked today
+      const savedAttendanceStatus = localStorage.getItem('attendanceStatus');
+      const savedAttendanceData = localStorage.getItem('attendanceData');
+      
+      if (savedAttendanceStatus === 'success' && savedAttendanceData) {
+        try {
+          const parsedData = JSON.parse(savedAttendanceData);
+          const savedDate = new Date(parsedData.timestamp);
+          const today = new Date();
+          
+          // If attendance was already marked today, just show the success state without making API call
+          if (savedDate.toDateString() === today.toDateString()) {
+            parsedData.timestamp = savedDate; // Convert string back to Date
+            setSuccessData(parsedData);
+            setShowSuccess(true);
+            return; // Exit early - no need to make API call again
+          }
+        } catch (error) {
+          console.error('Error parsing saved attendance data', error);
+          // Continue with normal flow if there's an error parsing the saved data
+        }
+      }
+      
       setLoading(true);
       setError(null);
       if (!webcamRef.current) {
@@ -149,14 +214,25 @@ function Settings() {
         },
         apiResponse,
       });
-      setSuccessData({
+      
+      const attendanceData = {
         timestamp: new Date(),
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
         photo,
         apiResponse,
-      });
+      };
+      
+      setSuccessData(attendanceData);
       setShowSuccess(true);
+      
+      // Save attendance status to localStorage
+      localStorage.setItem('attendanceStatus', 'success');
+      localStorage.setItem('attendanceData', JSON.stringify({
+        ...attendanceData,
+        timestamp: attendanceData.timestamp.toISOString(), // Convert Date to string for storage
+      }));
+      
       const employee = localStorage.getItem('employee_id') || '';
       await fetchLogs(employee);
     } catch (error: any) {
@@ -185,25 +261,19 @@ function Settings() {
                 <div>Check-in Time: {format(new Date(successData.timestamp), 'PPpp')}</div>
                 <div>Latitude: {successData.latitude.toFixed(6)}</div>
                 <div>Longitude: {successData.longitude.toFixed(6)}</div>
-                {/* {locationAccuracy && <div>Accuracy: {locationAccuracy.toFixed(0)} meters</div>} */}
-                {/* {successData.photo && (
-                  <div>
-                    <span>Captured Image URL: </span>
-                    <a href={successData.photo} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline break-all">
-                      {successData.photo.length > 60
-                        ? `${successData.photo.slice(0, 40)}...${successData.photo.slice(-8)}`
-                        : successData.photo}
-                    </a>
-                  </div>
-                )} */}
               </div>
-              {/* <button
-                className="mt-2 text-sm text-green-700 hover:text-green-900 underline"
-                onClick={() => setShowSuccess(false)}
-              >
-                Close
-              </button> */}
             </div>
+          </div>
+        )}
+        {showSuccess && (
+          <div className="flex justify-end">
+            <button
+              className="mt-2 text-white bg-[#B4251C] h-12 w-24 border rounded-xl font-medium text-base cursor-pointer p-0"
+              style={{ fontFamily: 'Rubik' }}
+              onClick={handleLogout}
+            >
+              Check out
+            </button>
           </div>
         )}
         {error && (

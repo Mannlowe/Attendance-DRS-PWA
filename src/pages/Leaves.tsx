@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore } from '../zustandStore/store';
 import { format } from 'date-fns';
+import { stopAllCameras } from '../utils/stopAllCameras';
 
 function Leaves() {
   const [showForm, setShowForm] = useState(false);
   const { leaves, addLeave } = useStore();
+
+  useEffect(() => {
+    stopAllCameras();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

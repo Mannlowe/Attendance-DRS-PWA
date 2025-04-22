@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, Mic, Eye, EyeOff } from 'lucide-react';
 import { loginWithAPI } from '../api/APILogin';
 import staffAttendanceImg from '../images/staff-attendance-01.png';
+import { stopAllCameras } from '../utils/stopAllCameras';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -11,6 +12,10 @@ const Login: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    stopAllCameras();
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,8 +37,17 @@ const Login: React.FC = () => {
         setError(response.message.message || 'Login failed.');
       }
     } catch (err: any) {
-      if (err.response && err.response.data && err.response.data.message && err.response.data.message.message) {
-        setError(err.response.data.message.message);
+      if (err.response && err.response.status === 404) {
+        const apiMessage = err.response.data?.message;
+        if (apiMessage === 'Employee Does Not Exists !') {
+          setError('Employee Does Not Exists !');
+        } else if (apiMessage === 'Authentication Error') {
+          setError('Authentication Error');
+        } else {
+          setError(apiMessage || 'Login failed. Please check your credentials or try again later.');
+        }
+      } else if (!navigator.onLine || (err.code && err.code === 'ERR_NETWORK')) {
+        setError('No network found');
       } else {
         setError('Login failed. Please check your credentials or try again later.');
       }

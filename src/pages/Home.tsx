@@ -1,11 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useStore } from '../store';
 import { format } from 'date-fns';
 import { ExternalLink } from 'lucide-react';
+import { stopAllCameras } from '../utils/stopAllCameras';
 
 function Home() {
   const { erpLinks, attendances } = useStore();
   const lastAttendance = attendances[attendances.length - 1];
+
+  useEffect(() => {
+    stopAllCameras();
+  }, []);
 
   return (
     <div className="space-y-6">

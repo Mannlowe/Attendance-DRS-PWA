@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { format } from 'date-fns';
 import { useStore } from '../zustandStore/store';
 import { fetchAttendanceLogs, AttendanceLog } from '../api/APIattendancelogs';
+import { stopAllCameras } from '../utils/stopAllCameras';
 
 interface AttendanceEntry {
   id: string;
@@ -19,6 +20,7 @@ const AttendanceLogs: React.FC = () => {
   const lastFive = attendances.slice(-5).reverse();
 
   useEffect(() => {
+    stopAllCameras();
     const employee = localStorage.getItem('employee_id') || '';
     fetchLogs(employee);
   }, [fetchLogs]);

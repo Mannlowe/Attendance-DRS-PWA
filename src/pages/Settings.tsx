@@ -1,11 +1,10 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import Webcam from 'react-webcam';
-import { Camera, Loader, AlertCircle, MapPin, CheckCircle, ArrowRight } from 'lucide-react';
 import { useStore } from '../zustandStore/store';
-import { format } from 'date-fns';
 import { logEmployeeCheckin } from '../api/APIattendance';
 import { checkoutAPI } from '../api/APILogin'
 import { useNavigate } from 'react-router-dom';
+import SettingsUI from './SettingsUI';
 
 function Settings() {
   // --- Attendance Section State & Logic ---
@@ -52,7 +51,7 @@ function Settings() {
       const employee_id = localStorage.getItem('employee_id');
       if (!employee_id) throw new Error('Employee ID missing');
   
-      await checkoutAPI({ employee_id }); // ✅ pass the params correctly
+      await checkoutAPI({ employee_id }); // pass the params correctly
       
       // Clear attendance status from localStorage
       localStorage.removeItem('attendanceStatus');
@@ -248,106 +247,21 @@ function Settings() {
   const isReady = cameraReady && locationStatus === 'ready' && !error;
 
   return (
-    <div className="space-y-4">
-      {/* --- Attendance Section (only after setup) --- */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold text-[#5E5E5E]" style={{ fontFamily: 'Montserrat' }}>Mark Attendance</h2>
-        {showSuccess && successData && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-start space-x-2 mb-2">
-            <CheckCircle className="text-green-500 flex-shrink-0 mt-0.5" size={20} />
-            <div className="flex-1">
-              <p className="font-medium text-green-900 mb-1" style={{ fontFamily: 'Rubik' }}>Attendance marked successfully!</p>
-              <div className="text-sm text-gray-800 gap-3 font-light" style={{ fontFamily: 'Rubik' }}>
-                <div>Check-in Time: {format(new Date(successData.timestamp), 'PPpp')}</div>
-                <div>Latitude: {successData.latitude.toFixed(6)}</div>
-                <div>Longitude: {successData.longitude.toFixed(6)}</div>
-              </div>
-            </div>
-          </div>
-        )}
-        {showSuccess && (
-          <div className="flex justify-end">
-            <button
-              className="mt-2 text-white bg-[#B4251C] h-12 w-24 border rounded-xl font-medium text-base cursor-pointer p-0"
-              style={{ fontFamily: 'Rubik' }}
-              onClick={handleLogout}
-            >
-              Check out
-            </button>
-          </div>
-        )}
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start space-x-2">
-            <AlertCircle className="text-red-500 flex-shrink-0 mt-0.5" size={18} />
-            <div className="flex-1">
-              <p className="text-sm text-red-800">{error}</p>
-              <button
-                onClick={checkLocationAccess}
-                className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
-              >
-                Try again
-              </button>
-            </div>
-          </div>
-        )}
-        {/* Hide this section once attendance is successful */}
-        {!showSuccess && (
-          <>
-            <div className="relative bg-gray-100 rounded-lg overflow-hidden">
-              {cameraReady ? (
-                <Webcam
-                  ref={webcamRef}
-                  screenshotFormat="image/jpeg"
-                  className="w-full rounded-lg"
-                  onUserMediaError={(err) => {
-                    setError('Failed to access camera: ' + err.message);
-                    setCameraReady(false);
-                  }}
-                />
-              ) : (
-                <div className="aspect-video flex items-center justify-center bg-gray-100 rounded-lg">
-                  <p className="text-gray-500">Initializing camera...</p>
-                </div>
-              )}
-              <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
-                {locationStatus === 'checking' ? (
-                  <div className="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full flex items-center space-x-2">
-                    <Loader className="animate-spin" size={16} />
-                    <span className="text-sm" style={{ fontFamily: 'Rubik' }}>Getting location...</span>
-                  </div>
-                ) : locationStatus === 'ready' && !error ? (
-                  <div className="bg-green-100 text-[#168B45] px-4 py-2 rounded-full flex items-center space-x-2">
-                    <CheckCircle size={16} />
-                    <span className="text-sm" style={{ fontFamily: 'Rubik' }}>Location verified</span>
-                  </div>
-                ) : null}
-                <button
-                  onClick={capture}
-                  disabled={loading || !isReady}
-                  className="bg-[#B4251C] text-white px-6 py-2 rounded-full flex items-center space-x-2 disabled:bg-[#B4251] disabled:cursor-not-allowed"
-                >
-                  {loading ? (
-                    <>
-                      <Loader className="animate-spin" size={20} />
-                      <span style={{ fontFamily: 'Rubik' }}>Processing...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Camera size={20} />
-                      <span style={{ fontFamily: 'Rubik' }}>Take Photo</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-            <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
-              <MapPin size={16} />
-              <p style={{ fontFamily: 'Rubik' }}>Please ensure you have a clear GPS signal to mark attendance</p>
-            </div>
-          </>
-        )}
-      </div>
-    </div>
+    <SettingsUI
+      showSuccess={showSuccess}
+      successData={successData}
+      handleLogout={handleLogout}
+      error={error}
+      checkLocationAccess={checkLocationAccess}
+      cameraReady={cameraReady}
+      webcamRef={webcamRef}
+      setError={setError}
+      setCameraReady={setCameraReady}
+      locationStatus={locationStatus}
+      loading={loading}
+      isReady={isReady}
+      capture={capture}
+    />
   );
 }
 

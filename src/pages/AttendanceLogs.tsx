@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { format } from 'date-fns';
 import { useStore } from '../zustandStore/store';
-import { fetchAttendanceLogs, AttendanceLog } from '../api/APIattendancelogs';
 import { stopAllCameras } from '../utils/stopAllCameras';
 
 interface AttendanceEntry {

@@ -186,6 +186,7 @@ function Settings() {
       }
       const position = await getLocation();
       setLocationAccuracy(position.coords.accuracy);
+      // The webcam display is already flipped with CSS transform in SettingsUI
       const photo = webcamRef.current.getScreenshot();
       if (!photo) {
         throw new Error('Failed to capture photo');

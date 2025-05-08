@@ -54,7 +54,7 @@ const SettingsUI: React.FC<SettingsUIProps> = ({
   return (
     <div className="space-y-4 mt-16 h-screen">
       {/* --- Attendance Section (only after setup) --- */}
-      <div className="space-y-4">
+      <div className="space-y-4 -mt-8">
         {!showSuccess && (
           <h2 className="text-xl font-semibold text-[#5E5E5E]" style={{ fontFamily: 'Montserrat' }}>Mark Attendance</h2>
         )}
@@ -102,13 +102,14 @@ const SettingsUI: React.FC<SettingsUIProps> = ({
         {!showSuccess && (
           <>
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start space-x-2">
-                <AlertCircle className="text-red-500 flex-shrink-0 mt-0.5" size={18} />
+              <div className="rounded-lg p-4 flex items-start space-x-2 bg-red-50 border border-red-200">
+                <AlertCircle className="flex-shrink-0 mt-0.5 text-red-500" size={20} />
                 <div className="flex-1">
-                  <p className="text-sm text-red-800">{error}</p>
+                  <p className="font-medium text-red-800" style={{ fontFamily: 'Rubik' }}>{error}</p>
                   <button
                     onClick={checkLocationAccess}
-                    className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
+                    className="mt-3 text-sm font-medium px-3 py-1 rounded-md bg-red-200 text-red-800"
+                    style={{ fontFamily: 'Rubik' }}
                   >
                     Try again
                   </button>
@@ -117,15 +118,20 @@ const SettingsUI: React.FC<SettingsUIProps> = ({
             )}
             <div className="relative bg-gray-100 rounded-lg overflow-hidden">
               {cameraReady ? (
-                <Webcam
-                  ref={webcamRef}
-                  screenshotFormat="image/jpeg"
-                  className="w-full rounded-lg"
-                  onUserMediaError={(err: string | DOMException) => {
-                    setError('Failed to access camera: ' + (typeof err === 'string' ? err : err.message));
-                    setCameraReady(false);
-                  }}
-                />
+                <div className="transform scale-x-[-1]">
+                  <Webcam
+                    ref={webcamRef}
+                    screenshotFormat="image/jpeg"
+                    className="w-full rounded-lg"
+                    videoConstraints={{
+                      facingMode: "user"
+                    }}
+                    onUserMediaError={(err: string | DOMException) => {
+                      setError('Failed to access camera: ' + (typeof err === 'string' ? err : err.message));
+                      setCameraReady(false);
+                    }}
+                  />
+                </div>
               ) : (
                 <div className="aspect-video flex items-center justify-center bg-gray-100 rounded-lg">
                   <p className="text-gray-500">Initializing camera...</p>

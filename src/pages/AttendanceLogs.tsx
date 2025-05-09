@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { format } from 'date-fns';
 import { useStore } from '../zustandStore/store';
 import { stopAllCameras } from '../utils/stopAllCameras';
-import { Filter, HelpCircle } from 'lucide-react';
+import { Filter, Info } from 'lucide-react';
 
 interface AttendanceEntry {
   id: string;
@@ -154,15 +154,15 @@ const AttendanceLogs: React.FC = () => {
                   className={`${getBgColorClass(entry)} rounded-lg shadow-2xl p-4 mb-2 flex flex-col relative`} 
                   style={{ fontFamily: 'Rubik' }}
                 >
-                  {/* Question mark icon only for rejected entries */}
-                  {entry.custom_attendance_status === 'Rejected' && (
+                  {/* Info icons for all status types */}
+                  {entry.custom_attendance_status && (
                     <>
                       <div className="reason-icon" onClick={(e) => toggleReasonTooltip(entry.name, e)}>
-                        <HelpCircle size={18} color="#4a5568" />
+                        <Info size={18} color="#4a5568" />
                       </div>
                       {visibleReasonId === entry.name && (
                         <div className="tooltip mt-2">
-                          {entry.custom_reason || "Rejected"}
+                          {entry.custom_reason || entry.custom_attendance_status}
                         </div>
                       )}
                     </>

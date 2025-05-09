@@ -50,15 +50,37 @@ function Settings() {
     try {
       const employee_id = localStorage.getItem('employee_id');
       if (!employee_id) throw new Error('Employee ID missing');
-  
-      await checkoutAPI({ employee_id }); // pass the params correctly
+
+      // Get current location for checkout
+      setLocationStatus('checking');
+      setError(null);
       
-      // Clear attendance status from localStorage
-      localStorage.removeItem('attendanceStatus');
-      localStorage.removeItem('attendanceData');
-  
-      sessionStorage.clear(); // cleanup
-      navigate('/'); // redirect
+      try {
+        const position = await getBestEffortLocation(8000);
+        setLocationAccuracy(position.coords.accuracy);
+        
+        // Include lat/long in checkout request
+        await checkoutAPI({ 
+          employee_id, 
+          lat: position.coords.latitude, 
+          long: position.coords.longitude 
+        });
+        
+        // Clear attendance status from localStorage
+        localStorage.removeItem('attendanceStatus');
+        localStorage.removeItem('attendanceData');
+    
+        sessionStorage.clear(); // cleanup
+        navigate('/'); // redirect
+      } catch (locationError) {
+        console.error('Location error during checkout:', locationError);
+        // Still attempt checkout without location if location fails
+        await checkoutAPI({ employee_id });
+        localStorage.removeItem('attendanceStatus');
+        localStorage.removeItem('attendanceData');
+        sessionStorage.clear();
+        navigate('/');
+      }
     } catch (error) {
       console.error('Checkout failed', error);
       setError('Failed to check out. Please try again.');

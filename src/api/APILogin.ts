@@ -36,6 +36,8 @@ export interface LoginResponse {
 // Checkout-related types
 export interface CheckoutParams {
   employee_id: string;
+  lat?: number;
+  long?: number;
 }
 
 export interface CheckoutResponse {
@@ -44,6 +46,8 @@ export interface CheckoutResponse {
     name: string;
     employee: string;
     time: string;
+    latitude: number;
+    longitude: number;
   };
 }
 

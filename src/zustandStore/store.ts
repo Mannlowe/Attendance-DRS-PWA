@@ -10,7 +10,9 @@ interface AppState {
   logs: AttendanceLog[];
   logsLoading: boolean;
   logsError: string | null;
-  fetchLogs: (employee?: string) => Promise<void>;
+  statusFilter: string;
+  setStatusFilter: (status: string) => void;
+  fetchLogs: (employee?: string, status?: string) => Promise<void>;
   addAttendance: (attendance: Attendance) => void;
   addLeave: (leave: Leave) => void;
 }
@@ -29,10 +31,19 @@ export const useStore = create<AppState>()(
       logs: [],
       logsLoading: false,
       logsError: null,
-      fetchLogs: async (employee) => {
+      statusFilter: '-',
+      setStatusFilter: (status) => set({ statusFilter: status }),
+      fetchLogs: async (employee, status) => {
         set({ logsLoading: true, logsError: null });
         try {
-          const response = await fetchAttendanceLogs({ employee, limit: 50 });
+          const params: any = { employee, limit: 50 };
+          
+          // Only add custom_attendance_status if it's not the default '-'
+          if (status && status !== '-') {
+            params.custom_attendance_status = status;
+          }
+          
+          const response = await fetchAttendanceLogs(params);
           const sortedLogs = (response.logs || []).sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
           set({ logs: sortedLogs, logsLoading: false });
         } catch (e) {

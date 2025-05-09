@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { format } from 'date-fns';
 import { useStore } from '../zustandStore/store';
 import { stopAllCameras } from '../utils/stopAllCameras';
-import { Filter } from 'lucide-react';
+import { Filter, HelpCircle } from 'lucide-react';
 
 interface AttendanceEntry {
   id: string;
@@ -14,10 +14,45 @@ interface AttendanceEntry {
   };
 }
 
+interface AttendanceLog {
+  name: string;
+  log_type: 'IN' | 'OUT';
+  time: string;
+  latitude: number;
+  longitude: number;
+  custom_attendance_status?: 'Approved' | 'Rejected' | 'In Process';
+  custom_reason?: string;
+  checkin_image?: string;
+}
+
 const AttendanceLogs: React.FC = () => {
   const { logs, logsLoading, logsError, fetchLogs, statusFilter, setStatusFilter } = useStore();
+  // Type assertion for logs array
+  const typedLogs = logs as AttendanceLog[];
   const attendances: AttendanceEntry[] = useStore((state: any) => state.attendances || []);
   const lastFive = attendances.slice(-5).reverse();
+  const [visibleReasonId, setVisibleReasonId] = useState<string | null>(null);
+  
+  // Function to toggle the visibility of a reason tooltip
+  const toggleReasonTooltip = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent event from bubbling up
+    setVisibleReasonId(visibleReasonId === id ? null : id);
+  };
+  
+  // Function to close the tooltip when clicking anywhere on the screen
+  useEffect(() => {
+    const handleClickOutside = () => {
+      if (visibleReasonId) {
+        setVisibleReasonId(null);
+      }
+    };
+    
+    document.addEventListener('click', handleClickOutside);
+    
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [visibleReasonId]);
 
   useEffect(() => {
     stopAllCameras();
@@ -52,16 +87,41 @@ const AttendanceLogs: React.FC = () => {
 
   // Get the latest 10 entries (both check-ins and check-outs) in chronological order
   const latestEntries = useMemo(() => {
-    if (!logs.length) return [];
+    if (!typedLogs.length) return [];
     
     // Sort all logs by time (newest first) and take the first 10
-    return [...logs]
+    return [...typedLogs]
       .sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
       .slice(0, 10);
-  }, [logs]);
+  }, [typedLogs]);
 
   return (
     <div className="max-w-lg mx-auto py-4 mb-10">
+      {/* Custom CSS for tooltip */}
+      <style>
+        {`
+          .tooltip {
+            position: absolute;
+            top: -5px;
+            right: 10px;
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 8px 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            max-width: 250px;
+            font-size: 12px;
+            color: #4a5568;
+          }
+          .reason-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+          }
+        `}
+      </style>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold text-[#5E5E5E]" style={{ fontFamily: 'Montserrat' }}>Attendance Logs</h2>
         <div className="flex items-center space-x-2 bg-white rounded-lg px-3 py-2 border border-gray-200 shadow-sm">
@@ -91,9 +151,22 @@ const AttendanceLogs: React.FC = () => {
             ? latestEntries.map((entry) => (
                 <li 
                   key={entry.name} 
-                  className={`${getBgColorClass(entry)} rounded-lg shadow-2xl p-4 mb-2 flex flex-col`} 
+                  className={`${getBgColorClass(entry)} rounded-lg shadow-2xl p-4 mb-2 flex flex-col relative`} 
                   style={{ fontFamily: 'Rubik' }}
                 >
+                  {/* Question mark icon only for rejected entries */}
+                  {entry.custom_attendance_status === 'Rejected' && (
+                    <>
+                      <div className="reason-icon" onClick={(e) => toggleReasonTooltip(entry.name, e)}>
+                        <HelpCircle size={18} color="#4a5568" />
+                      </div>
+                      {visibleReasonId === entry.name && (
+                        <div className="tooltip mt-2">
+                          {entry.custom_reason || "Rejected"}
+                        </div>
+                      )}
+                    </>
+                  )}
                   {entry.log_type === 'OUT' ? (
                     <>
                       <span className="font-medium text-[#4135c7]">
@@ -130,7 +203,8 @@ const AttendanceLogs: React.FC = () => {
                 </li>
               ))
             : lastFive.map((entry: AttendanceEntry) => (
-                <li key={entry.id} className="bg-green-200 rounded-lg shadow-2xl p-4 flex flex-col" style={{ fontFamily: 'Rubik' }}>
+                <li key={entry.id} className="bg-green-200 rounded-lg shadow-2xl p-4 flex flex-col relative" style={{ fontFamily: 'Rubik' }}>
+                  {/* For fallback entries, we don't have custom reasons */}
                   <span className="font-medium text-blue-700">Check-in Time: {format(new Date(entry.timestamp), 'PPpp')}</span>
                   <span className="text-gray-700">Latitude: {entry.location.latitude.toFixed(6)}</span>
                   <span className="text-gray-700">Longitude: {entry.location.longitude.toFixed(6)}</span>

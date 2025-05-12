@@ -166,7 +166,7 @@ const AttendanceLogs: React.FC = () => {
                       {visibleReasonId === entry.name && (
                         <div className="tooltip mt-2">
                           {entry.custom_attendance_status === 'Submitted' 
-                            ? "Contact admin, to upload your portal" 
+                            ? "Contact admin, to upload your photo in portal" 
                             : (entry.custom_reason || entry.custom_attendance_status)}
                         </div>
                       )}

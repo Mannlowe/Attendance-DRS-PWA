@@ -20,7 +20,7 @@ interface AttendanceLog {
   time: string;
   latitude: number;
   longitude: number;
-  custom_attendance_status?: 'Approved' | 'Rejected' | 'In Process';
+  custom_attendance_status?: 'Approved' | 'Rejected' | 'In Process' | 'Submitted';
   custom_reason?: string;
   checkin_image?: string;
 }
@@ -75,6 +75,8 @@ const AttendanceLogs: React.FC = () => {
           return 'bg-red-100';
         case 'In Process':
           return 'bg-yellow-100';
+        case 'Submitted':
+          return 'bg-gray-200'; // Grey background for Submitted status
         default:
           // Default coloring based on log_type if status doesn't match
           return entry.log_type === 'OUT' ? 'bg-red-200' : 'bg-green-200';
@@ -124,27 +126,28 @@ const AttendanceLogs: React.FC = () => {
       </style>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold text-[#5E5E5E]" style={{ fontFamily: 'Montserrat' }}>Attendance Logs</h2>
-        <div className="flex items-center space-x-2 bg-white rounded-lg px-3 py-2 border border-gray-200 shadow-sm">
+        <div className="flex items-center space-x-1 bg-white rounded-lg px-3 py-2 border border-gray-200 shadow-sm">
           <Filter size={16} className="text-gray-500" />
-          <select 
-            value={statusFilter}
+          <select
             onChange={handleStatusChange}
-            className="text-[12px] border-none focus:ring-0 outline-none bg-transparent"
+            value={statusFilter}
+            className="p-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             style={{ fontFamily: 'Rubik' }}
           >
             <option value="-">View All</option>
             <option value="Approved">Approved</option>
             <option value="Rejected">Rejected</option>
             <option value="In Process">In Process</option>
+            <option value="Submitted">Submitted</option>
           </select>
         </div>
       </div>
       {logsLoading ? (
-        <div className="text-gray-500">Loading...</div>
+        <div className="text-gray-500 text-center py-4 font-medium">Loading...</div>
       ) : logsError ? (
-        <div className="text-red-600">{logsError}</div>
+        <div className=" text-center py-6 font-semibold text-[21px] text-red-500" style={{ fontFamily: 'Rubik' }}>No logs found</div>
       ) : latestEntries.length === 0 && lastFive.length === 0 ? (
-        <div className="text-gray-500">No attendance records found.</div>
+        <div className="text-gray-500 text-center py-4 font-medium">No attendance records found.</div>
       ) : (
         <ul className="space-y-4">
           {latestEntries.length > 0
@@ -162,7 +165,9 @@ const AttendanceLogs: React.FC = () => {
                       </div>
                       {visibleReasonId === entry.name && (
                         <div className="tooltip mt-2">
-                          {entry.custom_reason || entry.custom_attendance_status}
+                          {entry.custom_attendance_status === 'Submitted' 
+                            ? "Contact admin, to upload your portal" 
+                            : (entry.custom_reason || entry.custom_attendance_status)}
                         </div>
                       )}
                     </>
@@ -195,7 +200,7 @@ const AttendanceLogs: React.FC = () => {
                           } 
                           alt="Check-in" 
                           className="mt-2 rounded shadow" 
-                          style={{ maxWidth: 350, maxHeight: 230 }} 
+                          style={{ maxWidth: 350, maxHeight: 310 }} 
                         />
                       )}
                     </>
